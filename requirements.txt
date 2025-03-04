@@ -1,0 +1,13 @@
+pandas
+numpy
+scikit-learn
+pyyaml
+transformers
+langdetect
+nltk
+tqdm
+mlflow
+torch
+seaborn
+matplotlib
+spacy

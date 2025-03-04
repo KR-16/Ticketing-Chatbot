@@ -1,0 +1,21 @@
+data:
+  raw_data_path: "data/dataset-tickets-multi-lang-4-20k.csv"
+  test_size: 0.2
+  random_state: 42
+
+preprocessing:
+  max_features: 10000
+  max_length: 200
+  language_detection: True
+  remove_stopwords: True
+
+model:
+  model_type: "multilingual-bert"
+  num_labels: 5
+  batch_size: 32
+  epochs: 10
+  learning_rate: 2e-5
+
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  experiment_name: "customer support chatbot"
