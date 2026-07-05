@@ -34,12 +34,17 @@ class DataPreprocessor:
         
     def validate_data(self, data: pd.DataFrame) -> bool:
         """Validate input data structure and content"""
-        required_columns = ['subject', 'body', 'type', 'priority', 'language']
-        
+        # queue is required by prepare_labels; tag_N columns by process_tags
+        required_columns = ['subject', 'body', 'type', 'queue', 'priority', 'language']
+
         # Check required columns
         if not all(col in data.columns for col in required_columns):
             missing_cols = [col for col in required_columns if col not in data.columns]
             self.logger.error(f"Missing required columns: {missing_cols}")
+            return False
+
+        if not any(re.fullmatch(r'tag_\d+', col) for col in data.columns):
+            self.logger.error("No tag_N columns found (expected tag_1..tag_8)")
             return False
             
         # Check for minimum data requirements
@@ -129,7 +134,12 @@ class DataPreprocessor:
     def process_tags(self, data: pd.DataFrame, fit: bool = True) -> pd.DataFrame:
         """Enhanced tag processing with multi-label encoding"""
         df = data.copy()
-        tag_cols = ['tag_1', 'tag_2', 'tag_3', 'tag_4', 'tag_5']
+        # Use every tag_N column present (the dataset ships tag_1..tag_8;
+        # the previous hardcoded tag_1..tag_5 list silently dropped tags 6-8)
+        tag_cols = sorted(
+            (col for col in df.columns if re.fullmatch(r'tag_\d+', col)),
+            key=lambda col: int(col.split('_')[1])
+        )
 
         # Combine tags
         df['tags'] = df[tag_cols].fillna('').agg(' '.join, axis=1)
