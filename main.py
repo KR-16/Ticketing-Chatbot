@@ -1,4 +1,6 @@
 import logging
+import os
+import yaml
 from src.data.data_loader import DataLoader
 from src.data.data_preprocessor import DataPreprocessor
 from src.models.model_builder import ModelBuilder
@@ -51,7 +53,11 @@ def main():
         trained_model = trainer.train(model, train_loader, val_loader)
 
         # Save Model
-        torch.save(trained_model.state_dict(), "models/customer_support_model.pth")
+        with open(config_path, "r") as file:
+            config = yaml.safe_load(file)
+        save_path = config["model"]["save_path"]
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        torch.save(trained_model.state_dict(), save_path)
         logger.info("Pipeline completed successfully!")
     except Exception as e:
         logger.error(f"Pipeline failed: {str(e)}")
