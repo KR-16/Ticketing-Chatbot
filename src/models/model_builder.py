@@ -9,6 +9,6 @@ class ModelBuilder:
     def build_model(self) -> nn.Module:
         model = AutoModelForSequenceClassification.from_pretrained(
             "bert-base-multilingual-cased",
-            num_labels = self.config["model"]["num_classes"]
+            num_labels = self.config["model"]["num_labels"]
         )
         return model
