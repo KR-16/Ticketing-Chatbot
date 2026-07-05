@@ -33,9 +33,9 @@ def main():
         train_inputs = preprocessor.tokenize(train_data["text"].tolist())
         test_inputs = preprocessor.tokenize(test_data["text"].tolist())
 
-        # Converting Labels to tensors
-        train_labels = torch.tensor(train_data["label"].values)
-        test_labels = torch.tensor(test_data["label"].values)
+        # Converting Labels to tensors (ticket type is the classification target)
+        train_labels = torch.tensor(train_data["type_label"].values)
+        test_labels = torch.tensor(test_data["type_label"].values)
 
         # Model Building
         logger.info("Building Model...")
