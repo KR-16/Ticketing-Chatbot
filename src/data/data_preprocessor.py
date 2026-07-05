@@ -11,8 +11,19 @@ from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
 from typing import Tuple, Dict
 import logging
 
-nltk.download("stopwords")
-nltk.download("punkt")
+def _ensure_nltk_data():
+    """Download NLTK resources only if missing, instead of on every import."""
+    # punkt_tab is required by word_tokenize on NLTK >= 3.8.2
+    resources = [
+        ("stopwords", "corpora/stopwords"),
+        ("punkt", "tokenizers/punkt"),
+        ("punkt_tab", "tokenizers/punkt_tab"),
+    ]
+    for resource, path in resources:
+        try:
+            nltk.data.find(path)
+        except LookupError:
+            nltk.download(resource, quiet=True)
 
 class DataPreprocessor:
     # langdetect returns ISO 639-1 codes; NLTK's stopwords corpus is keyed by full language names
@@ -25,6 +36,7 @@ class DataPreprocessor:
     }
 
     def __init__(self, config_path: str):
+        _ensure_nltk_data()
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-multilingual-cased")
