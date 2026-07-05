@@ -28,8 +28,8 @@ def main():
         # Preprocessing
         logger.info("Preprocessing Data...")
         preprocessor = DataPreprocessor(config_path)
-        train_data = preprocessor.preprocess_text(train_data)
-        test_data = preprocessor.preprocess_text(test_data)
+        train_data = preprocessor.preprocess_text(train_data, fit=True)
+        test_data = preprocessor.preprocess_text(test_data, fit=False)
 
         # Tokenization
         train_inputs = preprocessor.tokenize(train_data["text"].tolist())

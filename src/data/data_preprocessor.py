@@ -98,16 +98,27 @@ class DataPreprocessor:
         
         return df
 
-    def prepare_labels(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Enhanced label preparation with hierarchical encoding"""
+    def prepare_labels(self, data: pd.DataFrame, fit: bool = True) -> pd.DataFrame:
+        """Enhanced label preparation with hierarchical encoding.
+
+        Encoders are fit only when fit=True (training data); evaluation data
+        must reuse the fitted encoders so identical categories map to
+        identical integers across splits.
+        """
         df = data.copy()
-        
+
         # Encode categorical variables
         categorical_columns = ['type', 'priority', 'queue']
         for col in categorical_columns:
-            if col not in self.label_encoders:
+            if fit:
                 self.label_encoders[col] = LabelEncoder()
-            df[f'{col}_label'] = self.label_encoders[col].fit_transform(df[col])
+                df[f'{col}_label'] = self.label_encoders[col].fit_transform(df[col])
+            else:
+                if col not in self.label_encoders:
+                    raise ValueError(
+                        f"Encoder for '{col}' not fitted; preprocess training data first"
+                    )
+                df[f'{col}_label'] = self.label_encoders[col].transform(df[col])
         
         # Create priority level numeric mapping
         priority_map = {'low': 0, 'medium': 1, 'high': 2}
@@ -115,38 +126,48 @@ class DataPreprocessor:
         
         return df
 
-    def process_tags(self, data: pd.DataFrame) -> pd.DataFrame:
+    def process_tags(self, data: pd.DataFrame, fit: bool = True) -> pd.DataFrame:
         """Enhanced tag processing with multi-label encoding"""
         df = data.copy()
         tag_cols = ['tag_1', 'tag_2', 'tag_3', 'tag_4', 'tag_5']
-        
+
         # Combine tags
         df['tags'] = df[tag_cols].fillna('').agg(' '.join, axis=1)
         df['tags'] = df['tags'].str.strip()
-        
+
         # Create list of tags for each row
         df['tag_list'] = df['tags'].apply(lambda x: [tag for tag in x.split() if tag])
-        
-        # Multi-label encode tags
-        tag_matrix = self.mlb.fit_transform(df['tag_list'])
-        tag_df = pd.DataFrame(tag_matrix, columns=self.mlb.classes_)
-        
+
+        # Multi-label encode tags; fit on training data only so the encoded
+        # column set stays identical across splits (transform drops unseen tags)
+        if fit:
+            tag_matrix = self.mlb.fit_transform(df['tag_list'])
+        else:
+            tag_matrix = self.mlb.transform(df['tag_list'])
+        # Align on df's index: train_test_split preserves original row indices,
+        # and an index-mismatched concat would misalign every tag column
+        tag_df = pd.DataFrame(tag_matrix, columns=self.mlb.classes_, index=df.index)
+
         # Add encoded tags back to dataframe
         df = pd.concat([df, tag_df.add_prefix('tag_encoded_')], axis=1)
-        
+
         return df
 
-    def preprocess_text(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Enhanced main preprocessing pipeline"""
+    def preprocess_text(self, data: pd.DataFrame, fit: bool = True) -> pd.DataFrame:
+        """Enhanced main preprocessing pipeline.
+
+        Call with fit=True on training data, fit=False on test/validation
+        data so label and tag encoders are fit once and reused.
+        """
         # Validate input data
         if not self.validate_data(data):
             raise ValueError("Data validation failed")
-            
+
         try:
             # Apply preprocessing steps
             df = self.prepare_text_data(data)
-            df = self.prepare_labels(df)
-            df = self.process_tags(df)
+            df = self.prepare_labels(df, fit=fit)
+            df = self.process_tags(df, fit=fit)
             
             if self.config["preprocessing"]["language_detection"]:
                 df["language"] = df["text"].apply(self.detect_language)
