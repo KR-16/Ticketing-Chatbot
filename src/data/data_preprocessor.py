@@ -15,6 +15,15 @@ nltk.download("stopwords")
 nltk.download("punkt")
 
 class DataPreprocessor:
+    # langdetect returns ISO 639-1 codes; NLTK's stopwords corpus is keyed by full language names
+    ISO_TO_NLTK_LANGUAGE = {
+        "ar": "arabic", "da": "danish", "de": "german", "en": "english",
+        "es": "spanish", "fi": "finnish", "fr": "french", "hu": "hungarian",
+        "id": "indonesian", "it": "italian", "nl": "dutch", "no": "norwegian",
+        "pt": "portuguese", "ro": "romanian", "ru": "russian", "sv": "swedish",
+        "tr": "turkish",
+    }
+
     def __init__(self, config_path: str):
         with open(config_path, "r") as file:
             self.config = yaml.safe_load(file)
@@ -200,8 +209,9 @@ class DataPreprocessor:
         except:
             return "unknown"
     def remove_stopwords(self, text: str, language: str) -> str:
-        if language in stopwords.fileids():
-            stop_words = set(stopwords.words(language))
+        nltk_language = self.ISO_TO_NLTK_LANGUAGE.get(language)
+        if nltk_language and nltk_language in stopwords.fileids():
+            stop_words = set(stopwords.words(nltk_language))
             words = text.split()
             return " ".join([word for word in words if word.lower() not in stop_words])
         return text
