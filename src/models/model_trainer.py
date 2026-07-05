@@ -1,7 +1,7 @@
 import mlflow
 import torch
 from torch.utils.data import DataLoader, TensorDataset
-from transformers import AdamW
+from torch.optim import AdamW
 from tqdm import tqdm
 import yaml
 

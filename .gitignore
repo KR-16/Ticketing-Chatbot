@@ -171,8 +171,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Trained model artifacts
-models/
+# Trained model artifacts (root-anchored so src/models/ stays tracked)
+/models/
 
 # MLflow local tracking
-mlruns/
+/mlruns/
