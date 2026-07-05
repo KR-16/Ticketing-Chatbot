@@ -36,7 +36,7 @@ class ModelTrainer:
                 train_loss = 0
                 
                 for batch in tqdm(train_loader):
-                    input_ids = attention_mask, labels = batch
+                    input_ids, attention_mask, labels = batch
                     outputs = model(
                         input_ids = input_ids,
                         attention_mask = attention_mask,
@@ -44,7 +44,7 @@ class ModelTrainer:
                     )
 
                     loss = outputs.loss
-                    train_loss += loss.items()
+                    train_loss += loss.item()
 
                     loss.backward()
                     optimizer.step()
