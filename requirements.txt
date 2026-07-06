@@ -14,3 +14,4 @@ spacy>=3.7,<4
 fastapi>=0.110,<1
 uvicorn[standard]>=0.29
 pydantic>=2.6,<3
+streamlit>=1.35
