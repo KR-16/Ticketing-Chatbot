@@ -50,6 +50,16 @@ clones this repo, trains end-to-end, shows the evaluation metrics, and
 downloads a `ticketing_bundle.zip` containing `models/bundle/` and
 `reports/` — unzip it into the repo root locally to serve the model.
 
+### Demo UI
+
+```bash
+streamlit run app.py
+```
+
+Type (or paste) a ticket subject/body and get the predicted type with a
+confidence bar chart. Without a trained bundle the app shows setup
+instructions instead of failing.
+
 ### Docker
 
 Serve the API in a container (the trained bundle is mounted at runtime,
