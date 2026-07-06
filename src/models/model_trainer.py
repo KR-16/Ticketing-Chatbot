@@ -82,6 +82,12 @@ class ModelTrainer:
             model.parameters(),
             lr = self.config["model"]["learning_rate"]
         )
+        patience = self.config["model"].get("early_stopping_patience", 3)
+        checkpoint_path = os.path.join("models", "checkpoints", "best_state.pt")
+        os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
+        best_macro_f1 = -1.0
+        epochs_without_improvement = 0
+
         with mlflow.start_run():
             mlflow.log_params(self.config["model"])
             mlflow.log_params({"device": str(self.device), "seed": seed})
@@ -126,6 +132,30 @@ class ModelTrainer:
                     f"accuracy={val_accuracy:.4f} macro_f1={val_macro_f1:.4f}"
                 )
 
+                # Checkpoint the best epoch; stop when it stops improving
+                if val_macro_f1 > best_macro_f1:
+                    best_macro_f1 = val_macro_f1
+                    epochs_without_improvement = 0
+                    torch.save(model.state_dict(), checkpoint_path)
+                    self.logger.info(
+                        f"New best macro-F1 {val_macro_f1:.4f}; "
+                        f"checkpoint saved to {checkpoint_path}"
+                    )
+                else:
+                    epochs_without_improvement += 1
+                    if epochs_without_improvement >= patience:
+                        self.logger.info(
+                            f"Early stopping at epoch {epoch + 1}: no "
+                            f"improvement in {patience} epochs"
+                        )
+                        break
+
+            # Restore the best epoch so callers bundle/serve it, then report on it
+            model.load_state_dict(
+                torch.load(checkpoint_path, map_location=self.device)
+            )
+            mlflow.log_metrics({"best_validation_macro_f1": best_macro_f1})
+            _, val_labels, val_preds = self._evaluate(model, val_loader)
             self._log_final_report(val_labels, val_preds, class_names)
         return model
 

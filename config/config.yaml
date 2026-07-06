@@ -15,6 +15,7 @@ model:
   batch_size: 32
   epochs: 10
   learning_rate: 2e-5
+  early_stopping_patience: 3  # stop after this many epochs without macro-F1 improvement
   bundle_dir: "models/bundle"
 
 mlflow:
