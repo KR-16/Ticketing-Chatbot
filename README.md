@@ -35,16 +35,19 @@ NLTK resources (stopwords, punkt) download automatically on first run.
 
 ## Running
 
-Start a local MLflow server (the trainer logs to `http://localhost:5000`):
+```bash
+python main.py
+```
+
+### Experiment tracking
+
+MLflow is optional. If the server configured in `config.yaml`
+(`http://localhost:5000` by default) isn't running, training automatically
+falls back to local file tracking in `./mlruns` — inspect those runs with
+`mlflow ui`. To use a tracking server instead:
 
 ```bash
 mlflow server --host 127.0.0.1 --port 5000
-```
-
-Then run the pipeline:
-
-```bash
-python main.py
 ```
 
 The pipeline loads and splits the data (80/20), cleans and tokenizes the

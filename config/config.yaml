@@ -18,5 +18,7 @@ model:
   save_path: "models/customer_support_model.pth"
 
 mlflow:
+  # Optional: if unset or unreachable, training falls back to local file
+  # tracking in ./mlruns (view with `mlflow ui`)
   tracking_uri: "http://localhost:5000"
   experiment_name: "customer support chatbot"
