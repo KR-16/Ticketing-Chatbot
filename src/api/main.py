@@ -11,6 +11,7 @@ startup; if loading fails the API stays up and reports the problem via
 
 import logging
 import os
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
@@ -18,6 +19,7 @@ from fastapi.responses import JSONResponse
 
 from src.api.schemas import HealthResponse, PredictionResponse, TicketRequest
 from src.inference.predictor import TicketPredictor
+from src.logging_config import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,7 @@ def _load_predictor() -> TicketPredictor:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    setup_logging()
     try:
         app.state.predictor = _load_predictor()
         app.state.load_error = None
@@ -49,6 +52,18 @@ app = FastAPI(
     version="0.3.0",
     lifespan=lifespan,
 )
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration_ms = (time.perf_counter() - start) * 1000
+    logger.info(
+        f"{request.method} {request.url.path} "
+        f"-> {response.status_code} in {duration_ms:.1f}ms"
+    )
+    return response
 
 
 @app.exception_handler(Exception)
