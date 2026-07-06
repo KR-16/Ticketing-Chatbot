@@ -73,7 +73,8 @@ class DataPreprocessor:
             
         return True
 
-    def clean_text(self, text: str) -> str:
+    @staticmethod
+    def clean_text(text: str) -> str:
         """Enhanced text cleaning"""
         if not isinstance(text, str):
             return ""
@@ -246,13 +247,16 @@ class DataPreprocessor:
         self.label_encoders = encoders['label_encoders']
         self.mlb = encoders['multilabel_binarizer']
 
-    def detect_language(self, text:str) -> str:
+    @staticmethod
+    def detect_language(text: str) -> str:
         try:
             return detect(text)
         except:
             return "unknown"
-    def remove_stopwords(self, text: str, language: str) -> str:
-        nltk_language = self.ISO_TO_NLTK_LANGUAGE.get(language)
+
+    @classmethod
+    def remove_stopwords(cls, text: str, language: str) -> str:
+        nltk_language = cls.ISO_TO_NLTK_LANGUAGE.get(language)
         if nltk_language and nltk_language in stopwords.fileids():
             stop_words = set(stopwords.words(nltk_language))
             words = text.split()
