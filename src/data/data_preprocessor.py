@@ -1,6 +1,5 @@
 from transformers import AutoTokenizer
 import pandas as pd
-import numpy as np
 from langdetect import detect
 import nltk
 from nltk.corpus import stopwords
@@ -8,7 +7,7 @@ from nltk.tokenize import word_tokenize
 import yaml
 import re
 from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
-from typing import Tuple, Dict
+from typing import Dict
 import logging
 
 def _ensure_nltk_data():
@@ -251,7 +250,7 @@ class DataPreprocessor:
     def detect_language(text: str) -> str:
         try:
             return detect(text)
-        except:
+        except Exception:
             return "unknown"
 
     @classmethod

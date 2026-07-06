@@ -1,0 +1,6 @@
+[tool.ruff]
+# Notebooks are exploratory scratch space; lint the shipping code only
+extend-exclude = ["*.ipynb"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
