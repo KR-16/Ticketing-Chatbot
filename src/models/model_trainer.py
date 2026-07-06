@@ -1,5 +1,6 @@
 import logging
 import random
+import urllib.request
 
 import mlflow
 import numpy as np
@@ -22,8 +23,30 @@ class ModelTrainer:
             self.config =  yaml.safe_load(file)
         self.logger = logging.getLogger(__name__)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        mlflow.set_tracking_uri(self.config["mlflow"]["tracking_uri"])
-        mlflow.set_experiment(self.config["mlflow"]["experiment_name"])
+        self._setup_mlflow()
+
+    def _setup_mlflow(self):
+        """Point MLflow at the configured server, falling back to local file
+        tracking (./mlruns) when no server is configured or reachable, so the
+        pipeline runs on machines without MLflow infrastructure (e.g. Colab)."""
+        mlflow_config = self.config.get("mlflow", {})
+        tracking_uri = mlflow_config.get("tracking_uri") or "file:./mlruns"
+
+        if tracking_uri.startswith("http"):
+            try:
+                urllib.request.urlopen(
+                    f"{tracking_uri.rstrip('/')}/health", timeout=3
+                )
+            except (urllib.error.URLError, OSError):
+                self.logger.warning(
+                    f"MLflow server {tracking_uri} unreachable; "
+                    "falling back to local file tracking in ./mlruns"
+                )
+                tracking_uri = "file:./mlruns"
+
+        mlflow.set_tracking_uri(tracking_uri)
+        mlflow.set_experiment(mlflow_config.get("experiment_name", "default"))
+        self.logger.info(f"MLflow tracking: {tracking_uri}")
     
     def create_data_loader(self, inputs, labels) -> DataLoader:
         dataset = TensorDataset(
