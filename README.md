@@ -1,5 +1,7 @@
 # Ticketing-Chatbot
 
+[![CI](https://github.com/KR-16/Ticketing-Chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/KR-16/Ticketing-Chatbot/actions/workflows/ci.yml)
+
 Multilingual customer-support ticket classification. Fine-tunes
 `bert-base-multilingual-cased` to predict the **ticket type**
 (Incident, Request, Problem, Change) from a ticket's subject and body,
