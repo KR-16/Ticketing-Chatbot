@@ -1,0 +1,19 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # trained bundle from python main.py / the Colab notebook
+      - ./models/bundle:/app/models/bundle:ro
+
+  # Optional MLflow tracking server for training runs:
+  #   docker compose --profile tracking up
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    profiles: ["tracking"]
+    ports:
+      - "5000:5000"
+    command: mlflow server --host 0.0.0.0 --port 5000
+    volumes:
+      - ./mlruns:/mlruns
