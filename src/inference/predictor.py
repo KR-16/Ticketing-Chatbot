@@ -15,6 +15,7 @@ import logging
 import torch
 
 from src.data.data_preprocessor import DataPreprocessor, _ensure_nltk_data
+from src.logging_config import setup_logging
 from src.models.bundle import load_bundle
 
 logger = logging.getLogger(__name__)
@@ -89,10 +90,7 @@ def main():
                         help="Path to the inference bundle")
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
+    setup_logging()
     predictor = TicketPredictor(args.bundle_dir)
     result = predictor.predict(subject=args.subject, body=args.body)
     print(json.dumps(result, indent=2))

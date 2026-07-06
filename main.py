@@ -2,16 +2,11 @@ import logging
 import yaml
 from src.data.data_loader import DataLoader
 from src.data.data_preprocessor import DataPreprocessor
+from src.logging_config import setup_logging
 from src.models.model_builder import ModelBuilder
 from src.models.model_trainer import ModelTrainer
 from src.models.bundle import save_bundle
 import torch
-
-def setup_logging():
-    logging.basicConfig(
-        level = logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
 
 def main():
     config_path = "config/config.yaml"
