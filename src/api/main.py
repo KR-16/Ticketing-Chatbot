@@ -14,6 +14,7 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 
 from src.api.schemas import HealthResponse, PredictionResponse, TicketRequest
 from src.inference.predictor import TicketPredictor
@@ -48,6 +49,30 @@ app = FastAPI(
     version="0.3.0",
     lifespan=lifespan,
 )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """Never leak a traceback to callers; log it, return clean JSON."""
+    logger.exception(f"Unhandled error on {request.url.path}")
+    return JSONResponse(
+        status_code=500, content={"detail": "Internal server error"}
+    )
+
+
+@app.get("/health", response_model=HealthResponse)
+def health(request: Request) -> HealthResponse:
+    predictor = request.app.state.predictor
+    if predictor is None:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                f"Model not loaded: {request.app.state.load_error}. "
+                "Train a bundle (python main.py or notebooks/train_colab.ipynb) "
+                "or point BUNDLE_DIR at one."
+            ),
+        )
+    return HealthResponse(status="ok", classes=predictor.classes)
 
 
 @app.post("/predict", response_model=PredictionResponse)
