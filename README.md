@@ -39,6 +39,15 @@ NLTK resources (stopwords, punkt) download automatically on first run.
 python main.py
 ```
 
+### Training on Google Colab (recommended — free GPU)
+
+Open
+[`notebooks/train_colab.ipynb`](https://colab.research.google.com/github/KR-16/Ticketing-Chatbot/blob/main/notebooks/train_colab.ipynb)
+in Colab, switch the runtime to a T4 GPU, and run all cells. The notebook
+clones this repo, trains end-to-end, shows the evaluation metrics, and
+downloads a `ticketing_bundle.zip` containing `models/bundle/` and
+`reports/` — unzip it into the repo root locally to serve the model.
+
 ### Experiment tracking
 
 MLflow is optional. If the server configured in `config.yaml`
