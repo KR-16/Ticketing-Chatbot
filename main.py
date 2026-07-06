@@ -50,7 +50,10 @@ def main():
         train_loader = trainer.create_data_loader(train_inputs, train_labels)
         val_loader = trainer.create_data_loader(test_inputs, test_labels)
 
-        trained_model = trainer.train(model, train_loader, val_loader)
+        trained_model = trainer.train(
+            model, train_loader, val_loader,
+            class_names=preprocessor.label_encoders["type"].classes_.tolist(),
+        )
 
         # Save the complete inference bundle (model + tokenizer + labels + config)
         with open(config_path, "r") as file:
