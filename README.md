@@ -50,6 +50,23 @@ clones this repo, trains end-to-end, shows the evaluation metrics, and
 downloads a `ticketing_bundle.zip` containing `models/bundle/` and
 `reports/` — unzip it into the repo root locally to serve the model.
 
+### Docker
+
+Serve the API in a container (the trained bundle is mounted at runtime,
+so the image stays model-free):
+
+```bash
+docker compose up --build
+# then: curl http://localhost:8000/health
+```
+
+The container reports healthy only once a bundle exists at
+`models/bundle/`. To also run a local MLflow tracking server:
+
+```bash
+docker compose --profile tracking up
+```
+
 ### Experiment tracking
 
 MLflow is optional. If the server configured in `config.yaml`

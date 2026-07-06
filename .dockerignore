@@ -1,0 +1,12 @@
+venv/
+.git/
+.github/
+mlruns/
+models/
+data/
+notebooks/
+reports/
+tests/
+*.ipynb
+__pycache__/
+*.pyc
