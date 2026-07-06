@@ -1,10 +1,10 @@
 import logging
-import os
 import yaml
 from src.data.data_loader import DataLoader
 from src.data.data_preprocessor import DataPreprocessor
 from src.models.model_builder import ModelBuilder
 from src.models.model_trainer import ModelTrainer
+from src.models.bundle import save_bundle
 import torch
 
 def setup_logging():
@@ -52,12 +52,16 @@ def main():
 
         trained_model = trainer.train(model, train_loader, val_loader)
 
-        # Save Model
+        # Save the complete inference bundle (model + tokenizer + labels + config)
         with open(config_path, "r") as file:
             config = yaml.safe_load(file)
-        save_path = config["model"]["save_path"]
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        torch.save(trained_model.state_dict(), save_path)
+        save_bundle(
+            model=trained_model,
+            tokenizer=preprocessor.tokenizer,
+            label_encoder=preprocessor.label_encoders["type"],
+            config=config,
+            bundle_dir=config["model"]["bundle_dir"],
+        )
         logger.info("Pipeline completed successfully!")
     except Exception as e:
         logger.error(f"Pipeline failed: {str(e)}")

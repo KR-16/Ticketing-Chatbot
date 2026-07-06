@@ -15,7 +15,7 @@ model:
   batch_size: 32
   epochs: 10
   learning_rate: 2e-5
-  save_path: "models/customer_support_model.pth"
+  bundle_dir: "models/bundle"
 
 mlflow:
   # Optional: if unset or unreachable, training falls back to local file

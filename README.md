@@ -52,5 +52,20 @@ mlflow server --host 127.0.0.1 --port 5000
 
 The pipeline loads and splits the data (80/20), cleans and tokenizes the
 text, fine-tunes the model, logs train/validation loss per epoch to
-MLflow, and saves weights to `models/customer_support_model.pth`
-(path configurable via `model.save_path` in `config/config.yaml`).
+MLflow, and saves a complete **inference bundle** to `models/bundle/`
+(configurable via `model.bundle_dir` in `config/config.yaml`).
+
+### Inference bundle
+
+Everything needed to serve predictions lives in one directory:
+
+```
+models/bundle/
+  config.json, model.safetensors    # fine-tuned model (save_pretrained)
+  tokenizer_config.json, vocab.txt  # tokenizer (save_pretrained)
+  label_map.json                    # target column + ordered class names
+  training_config.yaml              # exact config the model was trained with
+```
+
+Load it with `src.models.bundle.load_bundle(path)`, which returns the
+model (in eval mode), tokenizer, class names, and training config.
