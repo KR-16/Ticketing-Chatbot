@@ -1,0 +1,45 @@
+[
+  {
+    "slug": "ticket-classifier",
+    "name": "Ticket Classifier",
+    "tagline": "Multilingual BERT that routes support tickets to the right queue in milliseconds",
+    "status": "beta",
+    "order": 1,
+    "year": "2026",
+    "featured": true,
+    "repo_url": "https://github.com/KR-16/Ticketing-Chatbot",
+    "demo_url": null,
+    "docs_url": null,
+    "primary_language": "Python",
+    "license": "Apache-2.0",
+    "topics": ["nlp", "bert", "multilingual", "ticket-classification", "mlops"],
+    "tech_stack": ["PyTorch", "Transformers", "FastAPI", "Streamlit", "Docker", "MLflow"],
+    "updated": "2026-07",
+    "problem": "Enterprise service desks process thousands of tickets daily. Manual triage — reading each ticket, deciding if it's an incident, a change request, a problem report, or a service request — is slow, inconsistent, and scales linearly with headcount. Misrouted tickets delay resolution and frustrate customers.\n\nThis project automates that decision: paste a ticket's subject and body, get the ITIL type back with a confidence score.",
+    "overview": "Ticket Classifier fine-tunes **bert-base-multilingual-cased** on 20,000 German and English support tickets to predict the ITIL ticket type — **Incident**, **Request**, **Problem**, or **Change** — from just the subject and body.\n\nThe trained model ships as a self-contained **inference bundle** (model weights, tokenizer, label map, and the exact training config) so training and serving never drift apart. The bundle plugs into a **FastAPI** REST API with Docker Compose for one-command deployment, or a **Streamlit** demo UI for interactive exploration.\n\n- Train on a free Colab T4 GPU in under 10 minutes\n- Serve predictions via a documented REST endpoint or an interactive web UI\n- MLflow experiment tracking with automatic file-based fallback when no server is running\n- 22 automated tests and CI on every push (linting, tests, Docker build)",
+    "features": [
+      {
+        "title": "Multilingual classification out of the box",
+        "detail": "Handles German and English tickets with a single model — no separate language detection step needed for routing."
+      },
+      {
+        "title": "Inference bundle eliminates train/serve skew",
+        "detail": "Model, tokenizer, label map, and training config ship as one directory. What you trained is exactly what you serve."
+      },
+      {
+        "title": "Production-shaped API with health checks",
+        "detail": "FastAPI service returns predictions with per-class confidence scores, reports 503 when no model is loaded, and ships in a slim Docker container."
+      },
+      {
+        "title": "Interactive demo with confidence visualization",
+        "detail": "Streamlit UI lets anyone paste a ticket and see the predicted type with a per-class probability bar chart — no code required."
+      },
+      {
+        "title": "One-click Colab training",
+        "detail": "Notebook clones the repo, trains end-to-end on a free GPU, and downloads a ready-to-serve bundle — no local GPU needed."
+      }
+    ],
+    "screenshots": [],
+    "overrides": {}
+  }
+]
